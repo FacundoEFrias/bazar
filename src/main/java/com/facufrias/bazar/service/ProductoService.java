@@ -1,5 +1,6 @@
 package com.facufrias.bazar.service;
 
+import com.facufrias.bazar.dto.ProductoDTO;
 import com.facufrias.bazar.model.Producto;
 import com.facufrias.bazar.repository.IProductoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,4 +67,27 @@ public class ProductoService implements IProductoService{
             }
             return listaProductosActualizados;
     }
-}
+
+    @Override
+    public List<ProductoDTO> searchProductos(String nombre, Double precioMinimo, Double precioMaximo) {
+        List<ProductoDTO> listaProductosDTO = new ArrayList<>();
+        List<Producto> productosEncontrados;
+        if(nombre != null && !nombre.isBlank() && precioMinimo != null && precioMaximo != null){
+            productosEncontrados = productoRepository.findByNombreContainingIgnoreCaseAndCostoBetween(nombre, precioMinimo, precioMaximo);
+        } else if (nombre != null && !nombre.isBlank()) {
+            productosEncontrados = productoRepository.findByNombreContainingIgnoreCase(nombre);
+        } else if (precioMinimo != null && precioMaximo != null) {
+            productosEncontrados = productoRepository.findByCostoBetween(precioMinimo, precioMaximo);
+
+        }
+        else {
+            productosEncontrados = productoRepository.findAll();
+        }
+        for(Producto pro : productosEncontrados){
+           ProductoDTO dto = new ProductoDTO(pro.getNombre(), pro.getMarca(), pro.getCosto());
+           listaProductosDTO.add(dto);
+        }
+        return listaProductosDTO;
+
+    }
+    }

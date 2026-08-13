@@ -1,5 +1,6 @@
 package com.facufrias.bazar.controller;
 
+import com.facufrias.bazar.dto.ProductoDTO;
 import com.facufrias.bazar.model.Producto;
 import com.facufrias.bazar.service.IProductoService;
 import jakarta.validation.Valid;
@@ -48,6 +49,15 @@ public class ProductosController {
         return new ResponseEntity<>(productoService.getProductosByCantidadDisponibleLessThan(cantidadDisponible), HttpStatus.OK);
     }
 
+    @GetMapping("/buscar")
+    public ResponseEntity<List<ProductoDTO>> searchProductos(
+            @RequestParam(required = false) String nombre,
+            @RequestParam(required = false) Double precioMinimo,
+            @RequestParam(required = false) Double precioMaximo
+    ){
+        return new ResponseEntity<>(productoService.searchProductos(nombre, precioMinimo, precioMaximo),HttpStatus.OK);
+    }
+
 
     @DeleteMapping("/eliminar/{codigoProducto}")
     public ResponseEntity<String> deleteProductoById(@PathVariable
@@ -65,5 +75,6 @@ public class ProductosController {
         productoService.editProductoById(codigoProducto,producto);
         return new ResponseEntity<>("El producto fue editado con exito", HttpStatus.OK);
     }
+
 
 }

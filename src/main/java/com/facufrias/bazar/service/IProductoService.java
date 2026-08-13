@@ -1,6 +1,8 @@
 package com.facufrias.bazar.service;
 
+import com.facufrias.bazar.dto.ProductoDTO;
 import com.facufrias.bazar.model.Producto;
+import org.springframework.data.domain.Sort;
 
 import java.util.List;
 
@@ -18,5 +20,10 @@ public interface IProductoService {
     void editProductoById(Long codigoProducto, Producto productoActualizado);
     //Traer todos los Productos que cuya cantidad sea menor a 5
     List<Producto> getProductosByCantidadDisponibleLessThan(Integer cantidadDisponible);
+
+    List<ProductoDTO> searchProductos(String nombre, Double precioMinimo, Double precioMaximo);
+
+
+
 
 }
