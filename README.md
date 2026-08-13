@@ -10,6 +10,7 @@ API REST desarrollada con **Java 21** y **Spring Boot 3** para la gestión integ
 * **Framework:** Spring Boot 3
 * **Persistencia:** Spring Data JPA / Hibernate
 * **Base de Datos:** MySQL
+* **Contenedores:** Docker & Docker Compose
 * **Documentación:** Swagger UI (SpringDoc OpenAPI)
 * **Herramientas & Librerías:**
   * Lombok (reducción de código boilerplate)
@@ -47,6 +48,20 @@ La API cuenta con un controlador de excepciones global (`@RestControllerAdvice`)
 * Respuestas de error estandarizadas con código HTTP, mensaje claro y timestamp.
 
 ---
+## 🐳 Despliegue con Docker
+
+El proyecto se encuentra totalmente contenedorizado para levantar la base de datos y la aplicación con un solo comando.
+
+### Requisitos
+* **Docker Desktop** instalado y en ejecución.
+
+### Pasos para ejecutar
+
+1. **Compilar el proyecto (generar el archivo .jar):**
+   ```bash
+   ./mvnw clean package -DskipTests
+2. **Levantar los servicios:**
+   docker compose up -d
 
 ## 📑 Documentación Interactiva (Swagger UI)
 

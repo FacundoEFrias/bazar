@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  # Servicio 1: Base de datos MySQL
+  mysqldb:
+    image: mysql:8.0
+    container_name: bazar-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: bazar
+    ports:
+      - "3307:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+
+  # Servicio 2: Aplicación Spring Boot
+  bazar-api:
+    build: .
+    container_name: bazar-app
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysqldb
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysqldb:3306/bazar?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+
+volumes:
+  db_data:
