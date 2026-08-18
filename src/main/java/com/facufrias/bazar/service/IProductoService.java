@@ -23,7 +23,7 @@ public interface IProductoService {
 
     List<ProductoDTO> searchProductos(String nombre, Double precioMinimo, Double precioMaximo);
 
-
+    void importarProductosExternos();
 
 
 }

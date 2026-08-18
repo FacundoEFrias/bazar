@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -81,20 +82,26 @@ public class VentaService implements IVentaService{
     @Override
     public List<Venta> getVentasByFecha(LocalDate fechaVenta) {
         List<Venta> listaVentas = this.getVentas();
-        List<Venta> listaFechaVenta = new ArrayList<>();
 
-        for(Venta venta : listaVentas){
+        return listaVentas.stream().filter(venta -> venta.getFechaVenta() != null && venta.getFechaVenta().equals(fechaVenta)).toList();
+
+        /*for(Venta venta : listaVentas){
                 if(venta.getFechaVenta() != null &&venta.getFechaVenta().equals(fechaVenta)){
                     listaFechaVenta.add(venta);
             }
-        }
-        return listaFechaVenta;
+        }*/
+
     }
 
     @Override
     public VentaDiaDTO getSumAndCountVentasByFecha(LocalDate fechaVenta) {
         List<Venta> listaVentas = this.getVentasByFecha(fechaVenta);
         VentaDiaDTO ventaDiaDTO = new VentaDiaDTO();
+        double totalMonto = listaVentas.stream().filter(venta -> venta.getTotal() != null).mapToDouble(Venta::getTotal).sum();
+        ventaDiaDTO.setMontoTotal(totalMonto);
+        ventaDiaDTO.setCantidadVentas(listaVentas.size());
+        return ventaDiaDTO;
+        /*
         double totalMonto = 0;
         for(Venta venta : listaVentas){
             if(venta.getTotal() != null){
@@ -103,7 +110,7 @@ public class VentaService implements IVentaService{
         }
         ventaDiaDTO.setMontoTotal(totalMonto);
         ventaDiaDTO.setCantidadVentas(listaVentas.size());
-        return  ventaDiaDTO;
+        return  ventaDiaDTO;*/
     }
 
     @Override
@@ -111,9 +118,10 @@ public class VentaService implements IVentaService{
         List<Venta> listaVentas = this.getVentas();
         VentaMayorVentaDTO ventaMayorVentaDTO = new VentaMayorVentaDTO();
         double maxMonto = 0;
-        Venta ventaMayor = null;
 
-        for(Venta venta : listaVentas){
+        Venta ventaMayor = listaVentas.stream().filter(venta -> venta.getTotal() != null).max(Comparator.comparing(Venta::getTotal)).orElse(null);
+
+        /*for(Venta venta : listaVentas){
             if(venta.getTotal() != null){
                 if(venta.getTotal() > maxMonto){
                     maxMonto = venta.getTotal();
@@ -121,11 +129,11 @@ public class VentaService implements IVentaService{
 
 
                 }
-            }
-        }
+            }*/
+
         if(ventaMayor != null){
             ventaMayorVentaDTO.setCodigoVenta(ventaMayor.getCodigoVenta());
-            ventaMayorVentaDTO.setTotal(maxMonto);
+            ventaMayorVentaDTO.setTotal(ventaMayor.getTotal());
             if(ventaMayor.getUnCliente() != null){
                 ventaMayorVentaDTO.setNombreCliente(ventaMayor.getUnCliente().getNombre());
                 ventaMayorVentaDTO.setApellidoCliente(ventaMayor.getUnCliente().getApellido());

@@ -1,18 +1,23 @@
 package com.facufrias.bazar.service;
 
+import com.facufrias.bazar.dto.ExternalProductDTO;
 import com.facufrias.bazar.dto.ProductoDTO;
 import com.facufrias.bazar.model.Producto;
 import com.facufrias.bazar.repository.IProductoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 @Service
 public class ProductoService implements IProductoService{
 
     @Autowired
     private IProductoRepository productoRepository;
+    @Autowired
+    private RestTemplate restTemplate;
 
     @Override
     public void createProducto(Producto producto) {
@@ -59,18 +64,17 @@ public class ProductoService implements IProductoService{
     @Override
     public List<Producto> getProductosByCantidadDisponibleLessThan(Integer cantidadDisponible) {
             List<Producto> listaproductos = this.getProductos();
-            List<Producto> listaProductosActualizados = new ArrayList<>();
-            for(Producto p : listaproductos){
+            return listaproductos.stream().filter(producto -> producto.getCantidadDisponible() < cantidadDisponible).toList();
+            /*for(Producto p : listaproductos){
                 if(p.getCantidadDisponible() < cantidadDisponible){
                     listaProductosActualizados.add(p);
                 }
             }
-            return listaProductosActualizados;
+            return listaProductosActualizados;*/
     }
 
     @Override
     public List<ProductoDTO> searchProductos(String nombre, Double precioMinimo, Double precioMaximo) {
-        List<ProductoDTO> listaProductosDTO = new ArrayList<>();
         List<Producto> productosEncontrados;
         if(nombre != null && !nombre.isBlank() && precioMinimo != null && precioMaximo != null){
             productosEncontrados = productoRepository.findByNombreContainingIgnoreCaseAndCostoBetween(nombre, precioMinimo, precioMaximo);
@@ -83,11 +87,30 @@ public class ProductoService implements IProductoService{
         else {
             productosEncontrados = productoRepository.findAll();
         }
+        /*
         for(Producto pro : productosEncontrados){
-           ProductoDTO dto = new ProductoDTO(pro.getNombre(), pro.getMarca(), pro.getCosto());
+//           ProductoDTO dto = new ProductoDTO(pro.getNombre(), pro.getMarca(), pro.getCosto());
            listaProductosDTO.add(dto);
-        }
-        return listaProductosDTO;
+        }*/
+        return productosEncontrados.stream().map(producto -> new ProductoDTO(producto.getNombre(),producto.getMarca(),producto.getCosto())).toList();
 
     }
+
+    @Override
+    public void importarProductosExternos() {
+        String url = "https://dummyjson.com/products";
+        ExternalProductDTO respuesta = restTemplate.getForObject(url, ExternalProductDTO.class);
+
+        if(respuesta != null && respuesta.getProducts() != null){
+            for(ExternalProductDTO.ProductItemDTO item : respuesta.getProducts()){
+                Producto producto = new Producto();
+                producto.setNombre(item.getTitle());
+                producto.setMarca(item.getBrand() != null ? item.getBrand() : "Sin marca");
+                producto.setCosto(item.getPrice());
+                producto.setCantidadDisponible(item.getStock());
+
+                productoRepository.save(producto);
+            }
+        }
     }
+}

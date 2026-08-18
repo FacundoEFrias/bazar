@@ -1,70 +1,73 @@
-# 🛍️ API REST - Bazar System
+# 🛒 Sistema de Gestión para Bazar
 
-API REST desarrollada con **Java 21** y **Spring Boot 3** para la gestión integral de un bazar. El sistema permite administrar clientes, productos y la generación de ventas con sus respectivos detalles y reportes estadísticos.
-
----
-
-## 🚀 Tecnologías Utilizadas
-
-* **Lenguaje:** Java 21
-* **Framework:** Spring Boot 3
-* **Persistencia:** Spring Data JPA / Hibernate
-* **Base de Datos:** MySQL
-* **Contenedores:** Docker & Docker Compose
-* **Documentación:** Swagger UI (SpringDoc OpenAPI)
-* **Herramientas & Librerías:**
-  * Lombok (reducción de código boilerplate)
-  * Jakarta Bean Validation (validación de datos de entrada)
-  * RestControllerAdvice (manejo global de excepciones)
-  * DTO Pattern (Data Transfer Object para respuestas desacopladas)
-  * Maven (gestión de dependencias)
+Aplicación backend desarrollada en Spring Boot para la gestión integral de un comercio, que incluye control de productos, clientes, ventas y la integración con una API externa para la importación automática de stock.
 
 ---
 
-## 🛠️ Funcionalidades Principales
+## 🚀 Tecnologías y Herramientas Utilizadas
 
-### 👤 Clientes
-* Crear, listar, obtener por ID, editar y eliminar clientes.
+*   **Java:** Versión moderna con Streams y programación funcional.
+*   **Spring Boot** (Web, Data JPA)
+*   **Spring Data JPA / Hibernate:** Para la persistencia y mapeo objeto-relacional.
+*   **RestTemplate:** Para el consumo de APIs externas.
+*   **Lombok:** Para reducir código repetitivo de getters, setters y constructores.
+*   **JUnit 5 & Mockito:** Para testing unitario.
+*   **Base de datos:** H2 (en memoria para desarrollo y pruebas).
+*   **Swagger/OpenAPI:** Documentación interactiva de la API.
 
-### 📦 Productos
-* Crear, listar, obtener por ID, editar y eliminar productos.
-* Búsqueda y filtrado dinámico combinado por nombre (parcial e insensible a mayúsculas) y/o rango de precios.
-* Consulta de productos con stock crítico (stock < 5).
-* Respuestas mapeadas a DTOs para protección de datos sensibles/internos de inventario.
+---
+## 🛠️ Arquitectura y Estructura del Proyecto
 
-### 🛒 Ventas
-* Registrar nuevas ventas con asociación automática de cliente y lista de productos.
-* Consultar la lista de productos pertenecientes a una venta específica.
-* Obtener la venta con el monto total más alto (incluyendo datos del cliente y cantidad de productos).
-* Consultar métricas de ventas por fecha determinada (cantidad de operaciones y sumatoria del dinero recaudado).
+El proyecto sigue una arquitectura de capas estándar:
+*   **Controller:** Expone los endpoints REST para la interacción con el cliente.
+*   **Service:** Contiene la lógica de negocio y procesamiento de datos mediante Streams de Java.
+*   **Repository:** Interfaces que extienden de JpaRepository para la comunicación con la base de datos.
+*   **Model / Entity:** Representación de las entidades de negocio (`Producto`, `Cliente`, `Venta`).
+*   **DTO:** Objetos de transferencia de datos optimizados para reportes, consultas específicas y consumo de APIs externas.
+
+---
+## 📌 Funcionalidades Principales
+
+*   **Gestión de Productos y Clientes:** Operaciones CRUD completas para el stock y la administración de compradores.
+*   **Gestión de Ventas:** Registro de ventas asociadas a clientes y listas de productos, control de stock y cálculos de negocio.
+*   **Consumo de API Externa:** Importación automática de productos desde un servicio externo (DummyJSON) utilizando RestClient/RestTemplate.
+*   **Procesamiento de Datos con Streams:**
+    *   Filtrado avanzado de productos por nombre, rangos de precios y disponibilidad.
+    *   Cálculos estadísticos, como la obtención del total y la cantidad de ventas por fecha.
+    *   Determinación de la venta de mayor monto con detalle de cliente y productos.
+---
+
+## 📖 Documentación de la API (Swagger)
+
+El proyecto incluye Swagger UI para probar los endpoints de forma interactiva. Una vez que la aplicación esté corriendo, podés acceder a la documentación en:
+`http://localhost:8080/swagger-ui.html`
 
 ---
 
-## 🛡️ Manejo de Errores y Validaciones
+## 🐳 Dockerización
 
-La API cuenta con un controlador de excepciones global (`@RestControllerAdvice`) que captura:
-* Fallos de validación en payloads DTO / Entities (`@Valid`, `@NotBlank`, `@Min`, etc.).
-* Excepciones por parámetros de ruta inválidos o recursos no encontrados.
-* Respuestas de error estandarizadas con código HTTP, mensaje claro y timestamp.
-
+Para levantar el entorno completo (aplicación + base de datos) usando Docker, utilizá:
+```bash
+docker-compose up --build
+```
 ---
-## 🐳 Despliegue con Docker
 
-El proyecto se encuentra totalmente contenedorizado para levantar la base de datos y la aplicación con un solo comando.
+## 🧪 Pruebas Unitarias (Testing)
 
-### Requisitos
-* **Docker Desktop** instalado y en ejecución.
+El proyecto cuenta con una suite robusta de tests unitarios implementados con JUnit 5 y Mockito, asegurando el correcto funcionamiento de las capas de servicio:
+*   Mockeo de repositorios para aislar y blindar la lógica de negocio.
+*   Pruebas de flujos exitosos para Productos, Clientes y Ventas.
 
-### Pasos para ejecutar
+Para ejecutar los tests, podés correr el siguiente comando en tu terminal:
+```bash
+./mvnw test
+```
+---
 
-1. **Compilar el proyecto (generar el archivo .jar):**
-   ```bash
-   ./mvnw clean package -DskipTests
-2. **Levantar los servicios:**
-   docker compose up -d
+## 👤 Autor
 
-## 📑 Documentación Interactiva (Swagger UI)
+* **Facundo Emanuel Frías**
 
-Una vez ejecutada la aplicación localmente, podés acceder a la interfaz de Swagger para probar todos los endpoints de manera interactiva:
+* **Backend Software Developer**
 
-👉 **[http://localhost:8080/swagger-ui/index.html](http://localhost:8080/swagger-ui/index.html)**
+[🔗 LinkedIn](https://www.linkedin.com/in/facundoemanuelfrias/) | [🐙 GitHub](https://github.com/FacundoEFrias)

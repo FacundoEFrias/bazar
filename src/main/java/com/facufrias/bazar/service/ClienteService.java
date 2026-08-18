@@ -10,8 +10,12 @@ import java.util.List;
 @Service
 public class ClienteService implements IClienteService {
 
-    @Autowired
-    private IClienteRepository clienteRepository;
+    private final IClienteRepository clienteRepository;
+
+    // Inyección por constructor (recomendado frente a @Autowired en campos)
+    public ClienteService(IClienteRepository clienteRepository) {
+        this.clienteRepository = clienteRepository;
+    }
     @Override
     public void createCliente(Cliente cliente) {
         clienteRepository.save(cliente);

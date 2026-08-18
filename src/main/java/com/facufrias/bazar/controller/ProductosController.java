@@ -27,6 +27,11 @@ public class ProductosController {
         productoService.createProducto(producto);
         return new ResponseEntity<>("Producto creado con exito", HttpStatus.CREATED);
     }
+    @PostMapping("/importar")
+    public ResponseEntity<String> importarProductos() {
+        productoService.importarProductosExternos();
+        return ResponseEntity.ok("¡Productos externos importados y guardados con éxito!");
+    }
     @GetMapping()
     public ResponseEntity<List<Producto>> getProductos(){
         return new ResponseEntity<>(productoService.getProductos(), HttpStatus.OK);
