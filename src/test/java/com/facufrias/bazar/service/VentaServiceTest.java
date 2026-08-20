@@ -2,6 +2,7 @@ package com.facufrias.bazar.service;
 
 import com.facufrias.bazar.dto.VentaDiaDTO;
 import com.facufrias.bazar.dto.VentaMayorVentaDTO;
+import com.facufrias.bazar.exception.ResourceNotFoundException;
 import com.facufrias.bazar.model.Cliente;
 import com.facufrias.bazar.model.Producto;
 import com.facufrias.bazar.model.Venta;
@@ -17,8 +18,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -84,6 +84,17 @@ public class VentaServiceTest {
 
     }
     @Test
+    void getVentaById_NoExitoso(){
+        Long id= 1L;
+        when(ventaRepository.findById(id)).thenReturn(Optional.empty());
+
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class, () ->{
+            ventaService.getVentaById(id);
+        });
+        assertEquals("Venta no encontrado con el ID: 1", exception.getMessage());
+        verify(ventaRepository, times(1)).findById(id);
+    }
+    @Test
     void createVenta(){
         ventaService.createVenta(venta1);
 
@@ -94,6 +105,18 @@ public class VentaServiceTest {
         ventaService.deleteVentaById(1L);
 
         verify(ventaRepository, times(1)).deleteById(1L);
+    }
+    @Test
+    void deleteVenta_NoExitoso(){
+        Long id = 1L;
+        when(ventaRepository.existsById(id)).thenReturn(false);
+
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class, ()->
+        {
+            ventaService.deleteVentaById(id);
+        });
+        assertEquals("No se puede eliminar. Venta no encontrado con ID: 1", exception.getMessage());
+        verify(ventaRepository, times(1)).existsById(id);
     }
     @Test
     void editVenta(){

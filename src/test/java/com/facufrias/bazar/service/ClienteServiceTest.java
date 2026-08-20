@@ -1,5 +1,6 @@
 package com.facufrias.bazar.service;
 
+import com.facufrias.bazar.exception.ResourceNotFoundException;
 import com.facufrias.bazar.model.Cliente;
 import com.facufrias.bazar.repository.IClienteRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,8 +13,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -59,6 +59,21 @@ public class ClienteServiceTest {
         verify(clienteRepository, times(1)).findById(1L);
     }
     @Test
+    void getClienteById_NoEncontrado_DeberiaLanzarExcepcion() {
+        Long idInexistente = 99L;
+
+        // Simulamos que el repositorio devuelve vacío
+        when(clienteRepository.findById(idInexistente)).thenReturn(Optional.empty());
+
+        // Verificamos que se lance la ResourceNotFoundException
+        ResourceNotFoundException excepcion = assertThrows(ResourceNotFoundException.class, () -> {
+            clienteService.getClienteById(idInexistente);
+        });
+
+        assertEquals("Cliente no encontrado con el ID: 99", excepcion.getMessage());
+        verify(clienteRepository, times(1)).findById(idInexistente);
+    }
+    @Test
     void createCliente(){
         clienteService.createCliente(cliente);
 
@@ -69,5 +84,17 @@ public class ClienteServiceTest {
         clienteService.deleteClienteById(1L);
 
         verify(clienteRepository, times(1)).deleteById(1L);
+    }
+    @Test
+    void deleteClienteById_NoExitoso(){
+        Long id = 1L;
+        when(clienteRepository.existsById(id)).thenReturn(false);
+
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class, () ->{
+            clienteService.deleteClienteById(id);
+        });
+        assertEquals("No se puede eliminar. Cliente no encontrado con el ID: 1", exception.getMessage());
+        verify(clienteRepository, times(1)).existsById(id);
+
     }
 }

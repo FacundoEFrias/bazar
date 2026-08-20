@@ -1,5 +1,6 @@
 package com.facufrias.bazar.service;
 
+import com.facufrias.bazar.exception.ResourceNotFoundException;
 import com.facufrias.bazar.model.Cliente;
 import com.facufrias.bazar.repository.IClienteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,11 +29,15 @@ public class ClienteService implements IClienteService {
 
     @Override
     public Cliente getClienteById(Long idCliente) {
-        return clienteRepository.findById(idCliente).orElse(null);
+        return clienteRepository.findById(idCliente).orElseThrow(() ->new ResourceNotFoundException("Cliente no encontrado con el ID: " + idCliente));
     }
 
     @Override
     public void deleteClienteById(Long idCliente) {
+
+        if(!clienteRepository.existsById(idCliente)){
+            throw new ResourceNotFoundException("No se puede eliminar. Cliente no encontrado con ID: "+ idCliente);
+        }
         clienteRepository.deleteById(idCliente);
     }
 

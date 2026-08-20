@@ -1,5 +1,6 @@
 package com.facufrias.bazar.service;
 
+import com.facufrias.bazar.exception.ResourceNotFoundException;
 import com.facufrias.bazar.model.Producto;
 import com.facufrias.bazar.repository.IProductoRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -56,6 +57,17 @@ class ProductoServiceTest {
         // Verificamos que se llamó al repositorio 1 sola vez
         verify(productoRepository, times(1)).findById(1L);
     }
+    @Test
+    void getProductoById_NoExitoso(){
+        Long id = 1L;
+        when(productoRepository.findById(id)).thenReturn(Optional.empty());
+
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class, () ->{
+            productoService.getProductoById(id);
+        });
+        assertEquals("Producto no encontrado con el ID: 1", exception.getMessage());
+        verify(productoRepository, times(1)).findById(id);
+    }
 
     @Test
     @DisplayName("Debería llamar al repository.save() al crear un producto")
@@ -107,6 +119,17 @@ class ProductoServiceTest {
         productoService.deleteProductoById(id);
 
         verify(productoRepository, times(1)).deleteById(id);
+    }
+    @Test
+    void deleteProductoById_NoExitoso(){
+        Long id = 1L;
+        when(productoRepository.existsById(id)).thenReturn(false);
+
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class, () ->{
+            productoService.deleteProductoById(id);
+        });
+        assertEquals("Producto no se puede eliminar. Producto no encontrado con el ID: 1", exception.getMessage());
+        verify(productoRepository, times(1)).existsById(id);
     }
     @Test
     void editProductoById(){

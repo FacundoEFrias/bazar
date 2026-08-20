@@ -2,6 +2,7 @@ package com.facufrias.bazar.service;
 
 import com.facufrias.bazar.dto.ExternalProductDTO;
 import com.facufrias.bazar.dto.ProductoDTO;
+import com.facufrias.bazar.exception.ResourceNotFoundException;
 import com.facufrias.bazar.model.Producto;
 import com.facufrias.bazar.repository.IProductoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,7 @@ public class ProductoService implements IProductoService{
 
     @Override
     public void createProducto(Producto producto) {
+
         productoRepository.save(producto);
     }
 
@@ -31,18 +33,22 @@ public class ProductoService implements IProductoService{
 
     @Override
     public Producto getProductoById(Long codigoProducto) {
-        return productoRepository.findById(codigoProducto).orElse(null);
+        return productoRepository.findById(codigoProducto).orElseThrow(()-> new ResourceNotFoundException("Producto no encontrado con el ID: " + codigoProducto));
     }
 
     @Override
     public void deleteProductoById(Long codigoProducto) {
+
+        if(!productoRepository.existsById(codigoProducto)){
+            throw new ResourceNotFoundException("Producto no se puede eliminar. Producto no encontrado con el ID: " + codigoProducto);
+        }
         productoRepository.deleteById(codigoProducto);
     }
 
     @Override
     public void editProductoById(Long codigoProducto, Producto productoActualizado) {
                 Producto prod = this.getProductoById(codigoProducto);
-                if(prod != null){
+
                     if(productoActualizado.getNombre() != null){
                         prod.setNombre(productoActualizado.getNombre());
                     }
@@ -57,7 +63,7 @@ public class ProductoService implements IProductoService{
                     }
 
                     productoRepository.save(prod);
-                }
+
 
     }
 

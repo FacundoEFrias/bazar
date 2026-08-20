@@ -2,6 +2,7 @@ package com.facufrias.bazar.service;
 
 import com.facufrias.bazar.dto.VentaDiaDTO;
 import com.facufrias.bazar.dto.VentaMayorVentaDTO;
+import com.facufrias.bazar.exception.ResourceNotFoundException;
 import com.facufrias.bazar.model.Producto;
 import com.facufrias.bazar.model.Venta;
 import com.facufrias.bazar.repository.IVentaRepository;
@@ -31,18 +32,23 @@ public class VentaService implements IVentaService{
 
     @Override
     public Venta getVentaById(Long codigoVenta) {
-        return ventaRepository.findById(codigoVenta).orElse(null);
+        return ventaRepository.findById(codigoVenta).orElseThrow(() -> new ResourceNotFoundException("Venta no encontrado con el ID: " + codigoVenta));
     }
 
     @Override
     public void deleteVentaById(Long codigoVenta) {
+
+        if(!ventaRepository.existsById(codigoVenta)){
+            throw new ResourceNotFoundException("No se puede eliminar. Venta no encontrado con ID: "+ codigoVenta);
+        }
+
         ventaRepository.deleteById(codigoVenta);
     }
 
     @Override
     public void editVentaById(Long codigoVenta, Venta ventaActualizada) {
         Venta venta = this.getVentaById(codigoVenta);
-        if(venta != null){
+
             if(ventaActualizada.getFechaVenta() != null){
                 venta.setFechaVenta(ventaActualizada.getFechaVenta());
             }
@@ -57,7 +63,7 @@ public class VentaService implements IVentaService{
                 venta.setUnCliente(ventaActualizada.getUnCliente());
             }
             ventaRepository.save(venta);
-        }
+
     }
 
     @Override
